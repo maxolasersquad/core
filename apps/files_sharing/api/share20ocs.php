@@ -158,6 +158,10 @@ class Share20OCS {
 		// Try both our default, and our federated provider..
 		$share = null;
 
+		if (!$this->shareManager->shareApiEnabled()) {
+			return new \OC_OCS_Result(null, 404, 'Share API is disabled');
+		}
+
 		// First check if it is an internal share.
 		try {
 			$share = $this->shareManager->getShareById('ocinternal:'.$id);
@@ -200,6 +204,10 @@ class Share20OCS {
 		// Try both our default and our federated provider
 		$share = null;
 
+		if (!$this->shareManager->shareApiEnabled()) {
+			return new \OC_OCS_Result(null, 404, 'Share API is disabled');
+		}
+
 		try {
 			$share = $this->shareManager->getShareById('ocinternal:' . $id);
 		} catch (ShareNotFound $e) {
@@ -234,6 +242,10 @@ class Share20OCS {
 	 */
 	public function createShare() {
 		$share = $this->shareManager->newShare();
+
+		if (!$this->shareManager->shareApiEnabled()) {
+			return new \OC_OCS_Result(null, 404, 'Share API is disabled');
+		}
 
 		// Verify path
 		$path = $this->request->getParam('path', null);
@@ -448,6 +460,10 @@ class Share20OCS {
 	 * @return \OC_OCS_Result
 	 */
 	public function getShares() {
+		if (!$this->shareManager->shareApiEnabled()) {
+			return new \OC_OCS_Result();
+		}
+
 		$sharedWithMe = $this->request->getParam('shared_with_me', null);
 		$reshares = $this->request->getParam('reshares', null);
 		$subfiles = $this->request->getParam('subfiles');
@@ -507,6 +523,10 @@ class Share20OCS {
 	public function updateShare($id) {
 		// Try both our default and our federated provider
 		$share = null;
+
+		if (!$this->shareManager->shareApiEnabled()) {
+			return new \OC_OCS_Result(null, 404, 'Share API is disabled');
+		}
 
 		try {
 			$share = $this->shareManager->getShareById('ocinternal:' . $id);

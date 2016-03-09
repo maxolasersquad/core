@@ -27,6 +27,7 @@ use OCP\IRequest;
 use OCP\IURLGenerator;
 use OCP\IUser;
 use OCP\Files\IRootFolder;
+use OCP\Lock\LockedException;
 use OCP\Share;
 use OCP\Share\IManager;
 
@@ -192,11 +193,19 @@ class Share20OCS {
 			return new \OC_OCS_Result(null, 404, 'wrong share ID, share doesn\'t exist.');
 		}
 
+		try {
+			$share->getNode()->lock(\OCP\Lock\ILockingProvider::LOCK_SHARED);
+		} catch (LockedException $e) {
+			return new \OC_OCS_Result(null, 404, 'could not delete share');
+		}
+
 		if (!$this->canAccessShare($share)) {
 			return new \OC_OCS_Result(null, 404, 'could not delete share');
 		}
 
 		$this->shareManager->deleteShare($share);
+
+		$share->getNode()->unlock(\OCP\Lock\ILockingProvider::LOCK_SHARED);
 
 		return new \OC_OCS_Result();
 	}
@@ -221,6 +230,7 @@ class Share20OCS {
 		}
 
 		$share->setNode($path);
+		$share->getNode()->lock(\OCP\Lock\ILockingProvider::LOCK_SHARED);
 
 		// Parse permissions (if available)
 		$permissions = $this->request->getParam('permissions', null);
@@ -347,8 +357,11 @@ class Share20OCS {
 			return new \OC_OCS_Result(null, 403, $e->getMessage());
 		}
 
-		$share = $this->formatShare($share);
-		return new \OC_OCS_Result($share);
+		$output = $this->formatShare($share);
+
+		$share->getNode()->unlock(\OCP\Lock\ILockingProvider::LOCK_SHARED);
+
+		return new \OC_OCS_Result($output);
 	}
 
 	/**
@@ -483,6 +496,8 @@ class Share20OCS {
 			return new \OC_OCS_Result(null, 404, 'wrong share ID, share doesn\'t exist.');
 		}
 
+		$share->getNode()->lock(\OCP\Lock\ILockingProvider::LOCK_SHARED);
+
 		if (!$this->canAccessShare($share)) {
 			return new \OC_OCS_Result(null, 404, 'wrong share Id, share doesn\'t exist.');
 		}
@@ -581,6 +596,8 @@ class Share20OCS {
 		} catch (\Exception $e) {
 			return new \OC_OCS_Result(null, 400, $e->getMessage());
 		}
+
+		$share->getNode()->unlock(\OCP\Lock\ILockingProvider::LOCK_SHARED);
 
 		return new \OC_OCS_Result($this->formatShare($share));
 	}

@@ -221,32 +221,29 @@ abstract class Node implements \Sabre\DAV\INode {
 
 		$path = $this->info->getInternalPath();
 
+		if ($storage->instanceOfStorage('\OC\Files\Storage\Shared')) {
+			/** @var \OC\Files\Storage\Shared $storage */
+			$permissions = (int)$storage->getShare()['permissions'];
+		} else {
+			$permissions = $storage->getPermissions($path);
+		}
+
 		/*
 		 * Without sharing permissions there are also no other permissions
 		 */
-		if (!$storage->isSharable($path)) {
+		if (!($permissions & \OCP\Constants::PERMISSION_SHARE) ||
+			!($permissions & \OCP\Constants::PERMISSION_READ)) {
 			return 0;
 		}
 
-		$p = \OCP\Constants::PERMISSION_READ | \OCP\Constants::PERMISSION_SHARE;
-
+		/*
+		 * Files can't have create or delete permissions
+		 */
 		if ($this->info->getType() === \OCP\Files\FileInfo::TYPE_FILE) {
-			if ($storage->isUpdatable($path)) {
-				$p |= \OCP\Constants::PERMISSION_UPDATE;
-			}
-		} else {
-			if ($storage->isDeletable($path)) {
-				$p |= \OCP\Constants::PERMISSION_DELETE;
-			}
-			if ($storage->isUpdatable($path)) {
-				$p |= \OCP\Constants::PERMISSION_UPDATE;
-			}
-			if ($storage->isCreatable($path)) {
-				$p |= \OCP\Constants::PERMISSION_CREATE;
-			}
+			$permissions &= ~(\OCP\Constants::PERMISSION_CREATE | \OCP\Constants::PERMISSION_DELETE);
 		}
 
-		return $p;
+		return $permissions;
 	}
 
 	/**

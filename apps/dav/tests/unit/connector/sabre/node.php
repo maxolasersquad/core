@@ -66,50 +66,50 @@ class Node extends \Test\TestCase {
 
 	public function sharePermissionsProvider() {
 		return [
-			[\OCP\Files\FileInfo::TYPE_FILE, false, false, false, false, 0],
-			[\OCP\Files\FileInfo::TYPE_FILE, false, false, false,  true, 0],
-			[\OCP\Files\FileInfo::TYPE_FILE, false, false,  true, false, 0],
-			[\OCP\Files\FileInfo::TYPE_FILE, false, false,  true,  true, 0],
-			[\OCP\Files\FileInfo::TYPE_FILE, false,  true, false, false, 0],
-			[\OCP\Files\FileInfo::TYPE_FILE, false,  true, false,  true, 0],
-			[\OCP\Files\FileInfo::TYPE_FILE, false,  true,  true, false, 0],
-			[\OCP\Files\FileInfo::TYPE_FILE, false,  true,  true,  true, 0],
-			[\OCP\Files\FileInfo::TYPE_FILE,  true, false, false, false, 17],
-			[\OCP\Files\FileInfo::TYPE_FILE,  true, false, false,  true, 17],
-			[\OCP\Files\FileInfo::TYPE_FILE,  true, false,  true, false, 19],
-			[\OCP\Files\FileInfo::TYPE_FILE,  true, false,  true,  true, 19],
-			[\OCP\Files\FileInfo::TYPE_FILE,  true,  true, false, false, 17],
-			[\OCP\Files\FileInfo::TYPE_FILE,  true,  true, false,  true, 17],
-			[\OCP\Files\FileInfo::TYPE_FILE,  true,  true,  true, false, 19],
-			[\OCP\Files\FileInfo::TYPE_FILE,  true,  true,  true,  true, 19],
-			[\OCP\Files\FileInfo::TYPE_FOLDER, false, false, false, false, 0],
-			[\OCP\Files\FileInfo::TYPE_FOLDER, false, false, false,  true, 0],
-			[\OCP\Files\FileInfo::TYPE_FOLDER, false, false,  true, false, 0],
-			[\OCP\Files\FileInfo::TYPE_FOLDER, false, false,  true,  true, 0],
-			[\OCP\Files\FileInfo::TYPE_FOLDER, false,  true, false, false, 0],
-			[\OCP\Files\FileInfo::TYPE_FOLDER, false,  true, false,  true, 0],
-			[\OCP\Files\FileInfo::TYPE_FOLDER, false,  true,  true, false, 0],
-			[\OCP\Files\FileInfo::TYPE_FOLDER, false,  true,  true,  true, 0],
-			[\OCP\Files\FileInfo::TYPE_FOLDER,  true, false, false, false, 17],
-			[\OCP\Files\FileInfo::TYPE_FOLDER,  true, false, false,  true, 25],
-			[\OCP\Files\FileInfo::TYPE_FOLDER,  true, false,  true, false, 19],
-			[\OCP\Files\FileInfo::TYPE_FOLDER,  true, false,  true,  true, 27],
-			[\OCP\Files\FileInfo::TYPE_FOLDER,  true,  true, false, false, 21],
-			[\OCP\Files\FileInfo::TYPE_FOLDER,  true,  true, false,  true, 29],
-			[\OCP\Files\FileInfo::TYPE_FOLDER,  true,  true,  true, false, 23],
-			[\OCP\Files\FileInfo::TYPE_FOLDER,  true,  true,  true,  true, 31],
+			[\OCP\Files\FileInfo::TYPE_FILE, 1, 0],
+			[\OCP\Files\FileInfo::TYPE_FILE, 3, 0],
+			[\OCP\Files\FileInfo::TYPE_FILE, 5, 0],
+			[\OCP\Files\FileInfo::TYPE_FILE, 7, 0],
+			[\OCP\Files\FileInfo::TYPE_FILE, 9, 0],
+			[\OCP\Files\FileInfo::TYPE_FILE, 11, 0],
+			[\OCP\Files\FileInfo::TYPE_FILE, 13, 0],
+			[\OCP\Files\FileInfo::TYPE_FILE, 15, 0],
+			[\OCP\Files\FileInfo::TYPE_FILE, 17, 17],
+			[\OCP\Files\FileInfo::TYPE_FILE, 19, 19],
+			[\OCP\Files\FileInfo::TYPE_FILE, 21, 17],
+			[\OCP\Files\FileInfo::TYPE_FILE, 23, 19],
+			[\OCP\Files\FileInfo::TYPE_FILE, 25, 17],
+			[\OCP\Files\FileInfo::TYPE_FILE, 27, 19],
+			[\OCP\Files\FileInfo::TYPE_FILE, 29, 17],
+			[\OCP\Files\FileInfo::TYPE_FILE, 30, 0],
+			[\OCP\Files\FileInfo::TYPE_FILE, 31, 19],
+			[\OCP\Files\FileInfo::TYPE_FOLDER, 1, 0],
+			[\OCP\Files\FileInfo::TYPE_FOLDER, 3, 0],
+			[\OCP\Files\FileInfo::TYPE_FOLDER, 5, 0],
+			[\OCP\Files\FileInfo::TYPE_FOLDER, 7, 0],
+			[\OCP\Files\FileInfo::TYPE_FOLDER, 9, 0],
+			[\OCP\Files\FileInfo::TYPE_FOLDER, 11, 0],
+			[\OCP\Files\FileInfo::TYPE_FOLDER, 13, 0],
+			[\OCP\Files\FileInfo::TYPE_FOLDER, 15, 0],
+			[\OCP\Files\FileInfo::TYPE_FOLDER, 17, 17],
+			[\OCP\Files\FileInfo::TYPE_FOLDER, 19, 19],
+			[\OCP\Files\FileInfo::TYPE_FOLDER, 21, 21],
+			[\OCP\Files\FileInfo::TYPE_FOLDER, 23, 23],
+			[\OCP\Files\FileInfo::TYPE_FOLDER, 25, 25],
+			[\OCP\Files\FileInfo::TYPE_FOLDER, 27, 27],
+			[\OCP\Files\FileInfo::TYPE_FOLDER, 29, 29],
+			[\OCP\Files\FileInfo::TYPE_FOLDER, 30, 0],
+			[\OCP\Files\FileInfo::TYPE_FOLDER, 31, 31],
 		];
 	}
 
 	/**
 	 * @dataProvider sharePermissionsProvider
 	 */
-	public function testSharePermissions($type, $canShare, $canCreate, $canChange, $canDelete, $expected) {
+	public function testSharePermissions($type, $permissions, $expected) {
 		$storage = $this->getMock('\OCP\Files\Storage');
-		$storage->method('isSharable')->willReturn($canShare);
-		$storage->method('isCreatable')->willReturn($canCreate);
-		$storage->method('isUpdatable')->willReturn($canChange);
-		$storage->method('isDeletable')->willReturn($canDelete);
+
+		$storage->method('getPermissions')->willReturn($permissions);
 
 		$info = $this->getMockBuilder('\OC\Files\FileInfo')
 			->disableOriginalConstructor()
